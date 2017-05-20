@@ -1,0 +1,1 @@
+scrapy crawl bikes -o result-jobs-multi-pages-content.csv

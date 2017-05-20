@@ -1,32 +1,18 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy import Request
+from firebase import db_init
 
-#firebase integration
-import pyrebase
+#Sanitize the arguments
+def sanitizeArgs(title, address, price, absolute_url):
+    print "Title is ", title
 
-#Firebase config
-config = {
-  "apiKey": "AIzaSyDQo_48l06qVMGbOIsGzftxKznq85x2IBE",
-  "authDomain": "spiderbike-36fa3.firebaseapp.com",
-  "databaseURL": "https://spiderbike-36fa3.firebaseio.com",
-  "storageBucket": "projectId.appspot.com"
-}
-
-firebase  = pyrebase.initialize_app(config)
-
-auth = firebase.auth()
-
-email = ''
-password = ''
-user = auth.sign_in_with_email_and_password(email, password)
-
-db = firebase.database()
 
 class BikesSpider(scrapy.Spider):
     name = 'bikes'
     allowed_domains = ['craigslist.org']
     start_urls = ['https://sfbay.craigslist.org/search/mcy/']
+
 
     def parse(self, response):
         #get individual bike elements from the page
@@ -45,18 +31,24 @@ class BikesSpider(scrapy.Spider):
         #Get the next set up pages till all pages are crawled
         relative_next_url = response.xpath('//a[@class="button next"]/@href').extract_first()
         absolute_next_url = response.urljoin(relative_next_url)
-        
+
         #Keep yielding till all the pages are done and keep calling self 
-        yield Request(absolute_next_url, callback=self.parse)
+        #yield Request(absolute_next_url, callback=self.parse)
 
     def parse_page(self, response):
         url = response.meta.get('URL')
         title = response.meta.get('Title')
         address = response.meta.get('Address')
         price = response.meta.get('Price')
-        
+
         #Using join as the descrition can be more than one line long
         description = "".join(line for line in response.xpath('//*[@id="postingbody"]/text()').extract())
-         
-        yield{'URL': url, 'Title': title, 'Address':address, 'Price':price, 'Description':description}
-              
+        attname = response.xpath('//*[@id="postingbody"]/text()').extract()
+        
+
+        sanitizeArgs(title, address, price, absolute_url)
+        db, user = db_init()
+        #db_data = {'URL': url, 'Title': title, 'Address':address, 'Price':price, 'Description':description}
+        #db.child("agents").child("Bikes").push(db_data, user['idToken'])
+
+        #yield{'URL': url, 'Title': title, 'Address':address, 'Price':price} 
