@@ -4,8 +4,12 @@ from scrapy import Request
 from firebase import db_init
 
 #Sanitize the arguments
-def sanitizeArgs(title, address, price, absolute_url):
-    print "Title is ", title
+#attrname is a list of attributes which is usually of the form: 
+# Name, condition, engine displacement(cc), fuel , color, title status, transmission
+#[u'2004 honda shadow aero', u'excellent', u'gas', u'black', u'clean', u'manual']
+def bikeInfo(bikeAttrs):
+    print "Attributes are ", bikeAttrs
+
 
 
 class BikesSpider(scrapy.Spider):
@@ -35,6 +39,7 @@ class BikesSpider(scrapy.Spider):
         #Keep yielding till all the pages are done and keep calling self 
         #yield Request(absolute_next_url, callback=self.parse)
 
+    #This method goes over every bike individually to scrape specific data
     def parse_page(self, response):
         url = response.meta.get('URL')
         title = response.meta.get('Title')
@@ -43,12 +48,31 @@ class BikesSpider(scrapy.Spider):
 
         #Using join as the descrition can be more than one line long
         description = "".join(line for line in response.xpath('//*[@id="postingbody"]/text()').extract())
-        attname = response.xpath('//*[@id="postingbody"]/text()').extract()
-        
 
-        sanitizeArgs(title, address, price, absolute_url)
+        #Get the bike attributes
+        bikeAttrs = response.xpath("//p[@class='attrgroup']/span/b/text()").extract()
+
+
+        bikeInfo(bikeAttrs)
+
+        #Get the locaiton of the bike and store it as a list of lat and long
+        maplocation = response.xpath("//div[contains(@id,'map')]")
+        lat = ''.join(maplocation.xpath('@data-latitude').extract())
+        longi = ''.join(maplocation.xpath('@data-longitude').extract())
+        print "Latitude is", lat
+
+
+        #Firebase setup
         db, user = db_init()
-        #db_data = {'URL': url, 'Title': title, 'Address':address, 'Price':price, 'Description':description}
+
+        #Data being pused in
+        #Currently the key is the bike title (TODO: Think of Sanitizing the name)
+        #Things that can be added to the DB:
+        #Price, Location, Condition, Color, Description,
+        db_data = {'Price':price, 'Lat':lat, 'Long':longi}
         #db.child("agents").child("Bikes").push(db_data, user['idToken'])
+
+        #Check if the key exists, if it does update else insert a new record
+        db.child("agents").child(bikeAttrs[0]).update(db_data, user['idToken'])
 
         #yield{'URL': url, 'Title': title, 'Address':address, 'Price':price} 
