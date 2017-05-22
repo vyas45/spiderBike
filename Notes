@@ -1,0 +1,14 @@
+* Database schema:
+
+    1. The database is keyed with the name of the bike
+        TODO : Cleanup the key name to be useful
+    2. Currently the key-val storage looks like:
+
+
+        Bike-Name :
+               |_ _ Url
+               |_ _ Price
+               |_ _ Location
+               |     |_ _ Lat
+               |     |_ _ Long
+               |_ _ Description

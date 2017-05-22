@@ -47,7 +47,7 @@ class BikesSpider(scrapy.Spider):
         price = response.meta.get('Price')
 
         #Using join as the descrition can be more than one line long
-        description = "".join(line for line in response.xpath('//*[@id="postingbody"]/text()').extract())
+        desc = "".join(line for line in response.xpath('//*[@id="postingbody"]/text()').extract())
 
         #Get the bike attributes
         bikeAttrs = response.xpath("//p[@class='attrgroup']/span/b/text()").extract()
@@ -59,8 +59,6 @@ class BikesSpider(scrapy.Spider):
         maplocation = response.xpath("//div[contains(@id,'map')]")
         lat = ''.join(maplocation.xpath('@data-latitude').extract())
         longi = ''.join(maplocation.xpath('@data-longitude').extract())
-        print "Latitude is", lat
-
 
         #Firebase setup
         db, user = db_init()
@@ -69,7 +67,7 @@ class BikesSpider(scrapy.Spider):
         #Currently the key is the bike title (TODO: Think of Sanitizing the name)
         #Things that can be added to the DB:
         #Price, Location, Condition, Color, Description,
-        db_data = {'Price':price, 'Lat':lat, 'Long':longi}
+        db_data = {'Url': url, 'Price':price, 'Location' : {'Lat':lat, 'Long':longi}, 'Desciption':desc}
         #db.child("agents").child("Bikes").push(db_data, user['idToken'])
 
         #Check if the key exists, if it does update else insert a new record
