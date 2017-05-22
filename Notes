@@ -12,3 +12,6 @@
                |     |_ _ Lat
                |     |_ _ Long
                |_ _ Description
+
+    3. Explore Firebase Cloud Functions to automate DB cleanup
+        1. If a listing goes down -> prune the record
