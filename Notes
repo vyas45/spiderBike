@@ -15,3 +15,22 @@
 
     3. Explore Firebase Cloud Functions to automate DB cleanup
         1. If a listing goes down -> prune the record
+
+* Using the data:
+
+    1. Filter out the bikes i might be interested in
+        1. Choose a set of factors (start with these)_
+              1. Model 
+              2. Price
+        2. Have an index associated with the bikes that are found
+              - Need to think of weighted index
+              - Let's start with just price factor, lowest price wins
+
+
+* Front-End Stuff:
+    1. Have a webpage to go through the datbase to work tbhrough data
+        - basic HTML 
+            - Start with a button that shows lowest priced bike
+            - Next - button to plot the bikes on the map
+    2. Javascript to render the maps
+        - Goes over the database to plot a map
