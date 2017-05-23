@@ -25,6 +25,7 @@
         2. Have an index associated with the bikes that are found
               - Need to think of weighted index
               - Let's start with just price factor, lowest price wins
+              - TODO: Sort the database according to prices
 
 
 * Front-End Stuff:
